@@ -3,7 +3,7 @@ package org.example;
 //Buffer to Object Interface
 public class ObjectToBufferDevice {
 
-    static byte[] encodeObjectIntoBuffer(DiskMetadata metadata) {
+    static byte[] encodeDiskMetadataObjectIntoBuffer(DiskMetadata metadata) {
         if (metadata == null) {
             throw new IllegalArgumentException("no valid superblock metadata found");
         }
@@ -61,7 +61,7 @@ public class ObjectToBufferDevice {
         return ramBuffer;
     }
 
-    static DiskMetadata decodeBufferIntoObject(byte[] ramBuffer) {
+    static DiskMetadata decodeBufferIntoDiskMetadataObject(byte[] ramBuffer) {
         if (ramBuffer == null) {
             throw new IllegalArgumentException("ramBuffer cannot be null");
         }

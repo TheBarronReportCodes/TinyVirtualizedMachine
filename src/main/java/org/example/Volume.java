@@ -20,7 +20,7 @@ public class Volume {
 
     public void format() throws IOException {      // object → buffer → disk [METADATA]
 
-        byte[] superblockBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(this.diskMetadata);
+        byte[] superblockBuffer = ObjectToBufferDevice.encodeDiskMetadataObjectIntoBuffer(this.diskMetadata);
 
         this.blockToBufferDevice.writeBufferIntoBlock(SUPERBLOCK_LOCATION, superblockBuffer);
 
