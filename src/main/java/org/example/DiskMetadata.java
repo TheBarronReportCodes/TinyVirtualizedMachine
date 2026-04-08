@@ -9,7 +9,6 @@ public class DiskMetadata {
     final byte[] magicSignature;         // identifies disk format type
     final byte   version;                // schema version
     final long   totalAddressableBlocks; // disk geometry
-
     final long   bitmapRegionStartBlock;     // bitmap region metadata
     final long   bitmapRegionBlockCount;     // bitmap region metadata
     final long   inodeTableRegionStartBlock; // inode region metadata
@@ -33,9 +32,9 @@ public class DiskMetadata {
 
     //builder design pattern: Offsets creation of the DiskMetadata object to another object, called the Builder; allowing fields to be validated & optionally created
     public static class Builder {
-        private byte[] magicSignature;          // identifies disk format type
-        private byte version;                   // schema version
-        private long totalAddressableBlocks;    // disk geometry
+        private byte[] magicSignature;            // identifies disk format type
+        private byte version;                     // schema version
+        private long totalAddressableBlocks;      // disk geometry
 
         private long  bitmapRegionStartBlock;     // bitmap region metadata
         private long  bitmapRegionBlockCount;     // bitmap region metadata

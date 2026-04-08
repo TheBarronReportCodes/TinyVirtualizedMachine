@@ -8,14 +8,14 @@ public class Volume {
     BlockToBufferDevice blockToBufferDevice;    // buffer → disk
     ObjectToBufferDevice objectToBufferDevice;  // buffer → object
     DiskMetadata diskMetadata;
-    InodeMetadata inodeMetadata;
+    FileMetadata fileMetadata;
     boolean isMounted;
     static final int SUPERBLOCK_LOCATION = 0;
 
-    public Volume(BlockToBufferDevice blockToBufferDevice, DiskMetadata diskMetadata, InodeMetadata inodeMetadata) {
+    public Volume(BlockToBufferDevice blockToBufferDevice, DiskMetadata diskMetadata, FileMetadata fileMetadata) {
         this.blockToBufferDevice = blockToBufferDevice;
         this.diskMetadata = diskMetadata;
-        this.inodeMetadata = inodeMetadata;
+        this.fileMetadata = fileMetadata;
     }
 
     public void format() throws IOException {      // object → buffer → disk [METADATA]
@@ -24,7 +24,7 @@ public class Volume {
 
         this.blockToBufferDevice.writeBufferIntoBlock(SUPERBLOCK_LOCATION, superblockBuffer);
 
-        //byte[] inodeMetadataBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(inodeMetadata);
+        //byte[] inodeMetadataBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(fileMetadata);
 
         //this.blockToBufferDevice.writeBufferIntoBlock(1, inodeMetadataBuffer);
     }

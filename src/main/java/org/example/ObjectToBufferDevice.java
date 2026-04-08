@@ -1,17 +1,19 @@
 package org.example;
 
+import java.io.File;
+
 //Buffer to Object Interface
 public class ObjectToBufferDevice {
 
     static byte[] encodeDiskMetadataObjectIntoBuffer(DiskMetadata metadata) {
         if (metadata == null) {
-            throw new IllegalArgumentException("no valid superblock metadata found");
+            throw new IllegalArgumentException("no valid disk metadata found");
         }
         if (metadata.magicSignature == null) {
             throw new IllegalArgumentException("magic signature cannot be null");
         }
         if (metadata.magicSignature.length != DiskMetadata.DiskMetadataSchema.MAGIC_SIGNATURE_LEN) {
-            throw new IllegalArgumentException("no valid superblock magic signature found");
+            throw new IllegalArgumentException("no valid magic signature found");
         }
 
         byte[] ramBuffer = new byte[BlockToBufferDevice.BLOCK_SIZE];
@@ -66,7 +68,7 @@ public class ObjectToBufferDevice {
             throw new IllegalArgumentException("ramBuffer cannot be null");
         }
         if (ramBuffer.length != BlockToBufferDevice.BLOCK_SIZE) {
-            throw new IllegalArgumentException("invalid superblock size");
+            throw new IllegalArgumentException("invalid buffer size");
         }
 
         // ---- magic ----
@@ -119,23 +121,71 @@ public class ObjectToBufferDevice {
                 .build();
     }
 
+    static byte[] encodeFileMetadataObjectIntoBuffer(FileMetadata metadata) {
+        byte[] ramBuffer = new byte[InodeTable.INODE_SIZE];
+
+        writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_TYPE_BYTE_OFFSET, metadata.fileType);
+        writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_SIZE_BYTE_OFFSET, metadata.fileSize);
+
+        int i = 0;
+        int pointersOffset = 0;
+        while(i < metadata.fileDiskBlockPointers.length) {
+            writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET + pointersOffset, metadata.fileDiskBlockPointers[i]);
+            pointersOffset += FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTER_LEN;
+            i++;
+        }
+
+        return ramBuffer;
+    }
+
+    static FileMetadata decodeBufferIntoFileMetadataObject(byte[] ramBuffer) {
+        if(ramBuffer == null) {
+            throw new IllegalArgumentException("ramBuffer cannot be null");
+        }
+        if(ramBuffer.length != BlockToBufferDevice.BLOCK_SIZE) {
+            throw new IllegalArgumentException("invalid buffer size");
+        }
+
+        byte fileType = ramBuffer[FileMetadata.InodeSchema.FILE_TYPE_BYTE_OFFSET];
+
+        long fileSize = readLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_SIZE_BYTE_OFFSET);
+
+        long[] diskBlockPointers = new long[FileMetadata.InodeSchema.TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS];
+
+        int i = 0;
+        int pointerOffset = 0;
+        while(i < diskBlockPointers.length) {
+            diskBlockPointers[i] = readLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET + pointerOffset);
+
+            pointerOffset = pointerOffset + FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTER_LEN;
+            i++;
+        }
+
+        return new FileMetadata.Builder()
+                    .setFileType(fileType)
+                    .setFileSize(fileSize)
+                    .setFileDiskBlockPointers(diskBlockPointers)
+                    .build();
+
+    }
+
     // -------------------------
     // Little-endian primitives
     // -------------------------
-    private static void writeLongLE(byte[] block, int offset, long value) {
+    private static void writeLongLE(byte[] buffer, int offset, long value) {
         int i = 0;
-        while (i < 8) {
-            block[offset + i] = (byte) ((value >> (8 * i)) & 0xFF);
+        while (i < 8) {                                               // Loop 8 times -> 64 bits
+            buffer[offset + i] = (byte) ((value >> (8 * i)) & 0xFF);  // Shift one byte from the 64-bit object and move into the buffer
             i++;
         }
     }
 
-    private static long readLongLE(byte[] block, int offset) {
-        long value = 0;
+    private static long readLongLE(byte[] buffer, int offset) {
+        long value = 0;                                         // This will accumulate the final 64-bit number.
         int i = 0;
-        while (i < 8) {
-            long unsignedByte = block[offset + i] & 0xFFL;
-            value |= (unsignedByte << (8 * i));
+        while (i < 8) {                                         // Loop 8 times -> 64 bits
+            long unsignedByte = buffer[offset + i] & 0xFFL;     // Read one byte at a time from the buffer
+            value |= (unsignedByte << (8 * i));                 // Shift the byte into the 64-bit object
             i++;
         }
         return value;
