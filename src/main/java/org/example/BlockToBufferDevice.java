@@ -15,7 +15,7 @@ public class BlockToBufferDevice {
         }
     }
 
-    public long getDiskBlockOffset(long blockIndex) {                       //disk block position
+    private long getDiskBlockOffset(long blockIndex) {                       //disk block position
         return (long) blockIndex * BLOCK_SIZE;
     }
 

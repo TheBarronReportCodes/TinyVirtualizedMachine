@@ -13,9 +13,9 @@ import java.io.IOException;
     That’s an 8× space win, and scanning bits is fast.
 
     Block #: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-    Bitmap: 1 1 1 1 0 0 1 0 0 0 0 0 0 0 0 0
+    BitmapRegion: 1 1 1 1 0 0 1 0 0 0 0 0 0 0 0 0
  **/
-public class Bitmap {
+public class BitmapRegion {
     BlockToBufferDevice blockToBufferDevice;
     long startBlock;                    // where bitmap region begins on disk
     long blockCount;                    // how many blocks the bitmap occupies
@@ -24,7 +24,7 @@ public class Bitmap {
     byte[] bitmap;
 
 
-    public Bitmap(BlockToBufferDevice blockToBufferDevice, DiskMetadata metadata) {
+    public BitmapRegion(BlockToBufferDevice blockToBufferDevice, DiskMetadata metadata) {
         if(blockToBufferDevice == null) {
             throw new IllegalArgumentException("block device cannot be null");
         }
@@ -92,7 +92,7 @@ public class Bitmap {
     public boolean isUsed(int blockOffset) {                                     // test if the bit representing a block is 1 (used)
         /**
          * Blocks:      0 1 2 3 4 5 6 7 | 8 9 10 11 12 13 14 15   | ...
-         * Bitmap byte: 0               | 1                       | ...     [block # / num of blocks per bitmap byte]
+         * BitmapRegion byte: 0               | 1                       | ...     [block # / num of blocks per bitmap byte]
          * Bit index:   0 1 2 3 4 5 6 7 | 0 1 2 3 4 5 6 7                   [block # / num of bits per bitmap byte]
          */
         requireNonNegative(blockOffset);
@@ -110,7 +110,7 @@ public class Bitmap {
     public void markUsed(int blockOffset) throws IOException {                       // mark the bit representing a block as 1 (used)
         /**
          * Blocks:      0 1 2 3 4 5 6 7 | 8 9 10 11 12 13 14 15   | ...
-         * Bitmap byte: 0               | 1                       | ...     [block # / num of blocks per bitmap byte]
+         * BitmapRegion byte: 0               | 1                       | ...     [block # / num of blocks per bitmap byte]
          * Bit index:   0 1 2 3 4 5 6 7 | 0 1 2 3 4 5 6 7                   [block # / num of bits per bitmap byte]
          */
         requireNonNegative(blockOffset);
@@ -128,9 +128,9 @@ public class Bitmap {
 
     public void markFree(int blockOffset) throws IOException {                         // mark the bit representing a block as 0 (free)
         /**
-         * Blocks:      0 1 2 3 4 5 6 7 | 8 9 10 11 12 13 14 15   | ...
-         * Bitmap byte: 0               | 1                       | ...     [block # / num of blocks per bitmap byte]
-         * Bit index:   0 1 2 3 4 5 6 7 | 0 1 2 3 4 5 6 7                   [block # / num of bits per bitmap byte]
+         * Blocks:            0 1 2 3 4 5 6 7 | 8 9 10 11 12 13 14 15   | ...
+         * BitmapRegion byte: 0               | 1                       | ...     [block # / num of blocks per bitmap byte]
+         * Bit index:         0 1 2 3 4 5 6 7 | 0 1 2 3 4 5 6 7                   [block # / num of bits per bitmap byte]
          */
         requireNonNegative(blockOffset);
         requireCorrectRange(blockOffset, this.totalDiskBlocksTracked);

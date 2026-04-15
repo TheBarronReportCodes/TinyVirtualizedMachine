@@ -3,12 +3,20 @@ package org.example;
 
 import java.util.Arrays;
 
-//disk metadata: data describing the disk itself; superblock (blockIndex 0 of disk) is where the metadata will be stored
+/**
+ *  disk metadata: data describing the disk itself
+ *
+ *  Block 0 → superblock
+ *  Block 1 → bitmap region
+ *  Block 2 → inode region (inodes 0–31)
+ *  Block 3 → inode region (inodes 32–63)
+ *  Block 4 → inode region (inodes 64–95)
+ */
 public class DiskMetadata {
 
-    final byte[] magicSignature;         // identifies disk format type
-    final byte   version;                // schema version
-    final long   totalAddressableBlocks; // disk geometry
+    final byte[] magicSignature;             // identifies disk format type
+    final byte   version;                    // schema version
+    final long   totalAddressableBlocks;     // disk geometry
     final long   bitmapRegionStartBlock;     // bitmap region metadata
     final long   bitmapRegionBlockCount;     // bitmap region metadata
     final long   inodeTableRegionStartBlock; // inode region metadata

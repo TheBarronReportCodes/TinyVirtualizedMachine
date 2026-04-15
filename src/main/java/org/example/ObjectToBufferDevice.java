@@ -1,8 +1,7 @@
 package org.example;
 
-import java.io.File;
-
-//Buffer to Object Interface
+//  Buffer to Object Interface
+//  This code does not read and write an inode object to disk; It reads and writes an inode object to and from an inode-sized byte buffer.
 public class ObjectToBufferDevice {
 
     static byte[] encodeDiskMetadataObjectIntoBuffer(DiskMetadata metadata) {
@@ -121,8 +120,12 @@ public class ObjectToBufferDevice {
                 .build();
     }
 
-    static byte[] encodeFileMetadataObjectIntoBuffer(FileMetadata metadata) {
-        byte[] ramBuffer = new byte[InodeTable.INODE_SIZE];
+    static byte[] encodeFileMetadataObjectIntoBuffer(FileMetadata metadata) {         // Inode -> byte[128]
+        if (metadata == null) {
+            throw new IllegalArgumentException("no valid disk metadata found");
+        }
+
+        byte[] ramBuffer = new byte[InodeTableManager.INODE_SIZE];
 
         writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_TYPE_BYTE_OFFSET, metadata.fileType);
         writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_SIZE_BYTE_OFFSET, metadata.fileSize);
@@ -138,11 +141,11 @@ public class ObjectToBufferDevice {
         return ramBuffer;
     }
 
-    static FileMetadata decodeBufferIntoFileMetadataObject(byte[] ramBuffer) {
+    static FileMetadata decodeBufferIntoFileMetadataObject(byte[] ramBuffer) {             // byte[128] -> Inode
         if(ramBuffer == null) {
             throw new IllegalArgumentException("ramBuffer cannot be null");
         }
-        if(ramBuffer.length != BlockToBufferDevice.BLOCK_SIZE) {
+        if(ramBuffer.length != InodeTableManager.INODE_SIZE) {
             throw new IllegalArgumentException("invalid buffer size");
         }
 
