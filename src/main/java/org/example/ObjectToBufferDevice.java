@@ -125,7 +125,7 @@ public class ObjectToBufferDevice {
             throw new IllegalArgumentException("no valid disk metadata found");
         }
 
-        byte[] ramBuffer = new byte[InodeTableManager.INODE_SIZE];
+        byte[] ramBuffer = new byte[InodeObjectToDiskDevice.INODE_SIZE];
 
         writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_TYPE_BYTE_OFFSET, metadata.fileType);
         writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_SIZE_BYTE_OFFSET, metadata.fileSize);
@@ -145,7 +145,7 @@ public class ObjectToBufferDevice {
         if(ramBuffer == null) {
             throw new IllegalArgumentException("ramBuffer cannot be null");
         }
-        if(ramBuffer.length != InodeTableManager.INODE_SIZE) {
+        if(ramBuffer.length != InodeObjectToDiskDevice.INODE_SIZE) {
             throw new IllegalArgumentException("invalid buffer size");
         }
 

@@ -46,12 +46,12 @@ public class FileMetadata {
         // ---- layout + consistency checks ----
         private void validateLayoutInvariants() {
             // Basic schema sanity
-            require(InodeTableManager.INODE_SIZE > 0, "inode size must be > 0");
+            require(InodeObjectToDiskDevice.INODE_SIZE > 0, "inode size must be > 0");
             require(InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET >= 0, "direct pointers offset must be >= 0");
             require(InodeSchema.FILE_DISK_BLOCK_POINTER_LEN > 0, "pointer size must be > 0");
-            require(InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET <= InodeTableManager.INODE_SIZE,
+            require(InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET <= InodeObjectToDiskDevice.INODE_SIZE,
                     "direct pointers offset must be <= inode size");
-            require((InodeTableManager.INODE_SIZE - InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) % InodeSchema.FILE_DISK_BLOCK_POINTER_LEN == 0,
+            require((InodeObjectToDiskDevice.INODE_SIZE - InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) % InodeSchema.FILE_DISK_BLOCK_POINTER_LEN == 0,
                     "direct pointer region must be an integer number of pointers");
 
 
@@ -111,7 +111,7 @@ public class FileMetadata {
 
         static final int FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET = 16;
         static final int FILE_DISK_BLOCK_POINTER_LEN = 8;
-        static final int TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS = (InodeTableManager.INODE_SIZE - FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) / FILE_DISK_BLOCK_POINTER_LEN;
+        static final int TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS = (InodeObjectToDiskDevice.INODE_SIZE - FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) / FILE_DISK_BLOCK_POINTER_LEN;
 
     }
 

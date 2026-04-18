@@ -29,7 +29,7 @@ public class Volume {
         //this.blockToBufferDevice.writeBufferIntoBlock(1, inodeMetadataBuffer);
     }
 
-    public void format(BitmapRegion bitmapRegion, InodeTableManager inodeRegion) throws IOException {                                // object → buffer → disk [REGIONS]
+    public void format(BitmapRegion bitmapRegion, InodeObjectToDiskDevice inodeRegion) throws IOException {                                // object → buffer → disk [REGIONS]
 
         //byte[] bitmapRegionBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(bitmapRegion);
 
