@@ -24,20 +24,10 @@ public class Volume {
 
         this.blockToBufferDevice.writeBufferIntoBlock(SUPERBLOCK_LOCATION, superblockBuffer);
 
-        //byte[] inodeMetadataBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(fileMetadata);
-
-        //this.blockToBufferDevice.writeBufferIntoBlock(1, inodeMetadataBuffer);
     }
 
     public void format(BitmapRegion bitmapRegion, InodeObjectToDiskDevice inodeRegion) throws IOException {                                // object → buffer → disk [REGIONS]
 
-        //byte[] bitmapRegionBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(bitmapRegion);
-
-        //this.blockToBufferDevice.writeBufferIntoBlock(this.diskMetadata.bitmapRegionStartBlock, bitmapRegionBuffer);
-
-        //byte[] inodeRegionBuffer = ObjectToBufferDevice.encodeObjectIntoBuffer(inodeRegion);
-
-        //this.blockToBufferDevice.writeBufferIntoBlock(this.diskMetadata.inodeTableRegionStartBlock, inodeRegionBuffer);
     }
 
     public void mount() throws IOException {                                                         // disk → buffer → object

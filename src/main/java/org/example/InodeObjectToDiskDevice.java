@@ -3,6 +3,7 @@ package org.example;
 import java.io.IOException;
 
 /**
+ * PURPOSE: Given an index, retrieve or persist fileMetadata to/from Disk
  *
  * reads and writes an inodeBuffer to and from disk; the inode table is not supposed to live fully in RAM
  *
