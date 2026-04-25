@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * PURPOSE: Given an index, retrieve or persist fileMetadata to/from Disk
  *
- * reads and writes an inodeBuffer to and from disk; the inode table is not supposed to live fully in RAM
+ * reads and writes an inodeBuffer to/from disk
  *
  * Uses:
  *
@@ -26,7 +26,6 @@ public class InodeObjectToDiskDevice {
     DiskMetadata diskMetadata;
     BlockToBufferDevice blockToBufferDevice;
     final int inodesPerBlock;
-    final long totalAddressableInodes;
 
     public InodeObjectToDiskDevice(DiskMetadata diskMetadata, BlockToBufferDevice blockToBufferDevice) {
         if (diskMetadata == null) {
@@ -37,7 +36,6 @@ public class InodeObjectToDiskDevice {
         this.blockToBufferDevice = blockToBufferDevice;
 
         this.inodesPerBlock = BlockToBufferDevice.BLOCK_SIZE / INODE_SIZE;
-        this.totalAddressableInodes = inodesPerBlock * diskMetadata.inodeTableRegionBlockCount;
     }
 
     /**

@@ -35,13 +35,21 @@ public class ObjectToBufferDevice {
 
 
         writeLongLE(ramBuffer,
-                DiskMetadata.DiskMetadataSchema.BITMAP_REGION_START_BLOCK_BYTE_OFFSET,
-                metadata.bitmapRegionStartBlock);
+                DiskMetadata.DiskMetadataSchema.INODE_BITMAP_REGION_START_BLOCK_BYTE_OFFSET,
+                metadata.inodeBitmapRegionStartBlock);
 
 
         writeLongLE(ramBuffer,
-                DiskMetadata.DiskMetadataSchema.BITMAP_REGION_BLOCK_COUNT_BYTE_OFFSET,
-                metadata.bitmapRegionBlockCount);
+                DiskMetadata.DiskMetadataSchema.INODE_BITMAP_REGION_BLOCK_COUNT_BYTE_OFFSET,
+                metadata.inodeBitmapRegionBlockCount);
+
+        writeLongLE(ramBuffer,
+                DiskMetadata.DiskMetadataSchema.DISK_BLOCK_BITMAP_REGION_START_BLOCK_BYTE_OFFSET,
+                metadata.diskblockBitmapRegionStartBlock);
+
+        writeLongLE(ramBuffer,
+                DiskMetadata.DiskMetadataSchema.DISK_BLOCK_BITMAP_REGION_BLOCK_COUNT_BYTE_OFFSET,
+                metadata.diskblockBitmapRegionBlockCount);
 
 
         writeLongLE(ramBuffer,
@@ -88,12 +96,19 @@ public class ObjectToBufferDevice {
                 readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.TOTAL_ADDRESSABLE_DISK_BLOCKS_BYTE_OFFSET);
 
 
-        long bitmapRegionStartBlock =
-                readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.BITMAP_REGION_START_BLOCK_BYTE_OFFSET);
+        long inodeBitmapRegionStartBlock =
+                readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.INODE_BITMAP_REGION_START_BLOCK_BYTE_OFFSET);
 
 
-        long bitmapRegionBlockCount =
-                readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.BITMAP_REGION_BLOCK_COUNT_BYTE_OFFSET);
+        long inodeBitmapRegionBlockCount =
+                readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.INODE_BITMAP_REGION_BLOCK_COUNT_BYTE_OFFSET);
+
+        long diskBlockBitmapRegionStartBlock =
+                readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.DISK_BLOCK_BITMAP_REGION_START_BLOCK_BYTE_OFFSET);
+
+
+        long diskBlockBitmapRegionBlockCount =
+                readLongLE(ramBuffer, DiskMetadata.DiskMetadataSchema.DISK_BLOCK_BITMAP_REGION_BLOCK_COUNT_BYTE_OFFSET);
 
 
         long inodeTableRegionStartBlock =
@@ -112,8 +127,10 @@ public class ObjectToBufferDevice {
                 .magicSignature(magicSignature)
                 .version(version)
                 .totalAddressableBlocks(totalAddressableDiskBlocks)
-                .bitmapRegionStartBlock(bitmapRegionStartBlock)
-                .bitmapRegionBlockCount(bitmapRegionBlockCount)
+                .inodeBitmapRegionStartBlock(inodeBitmapRegionStartBlock)
+                .inodeBitmapRegionBlockCount(inodeBitmapRegionBlockCount)
+                .diskBlockBitmapRegionStartBlock(diskBlockBitmapRegionStartBlock)
+                .diskBlockBitmapRegionBlockCount(diskBlockBitmapRegionBlockCount)
                 .inodeTableRegionStartBlock(inodeTableRegionStartBlock)
                 .inodeTableRegionBlockCount(inodeTableRegionBlockCount)
                 .dataRegionStartBlock(dataRegionStartBlock)
