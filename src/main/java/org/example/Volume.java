@@ -26,7 +26,7 @@ public class Volume {
 
     }
 
-    public void format(BitmapObjectToDiskDevice bitmapRegion, InodeObjectToDiskDevice inodeRegion) throws IOException {                                // object → buffer → disk [REGIONS]
+    public void format(InodeBitmapperObjectToDiskDevice bitmapRegion, InodeObjectToDiskDevice inodeRegion) throws IOException {                                // object → buffer → disk [REGIONS]
 
     }
 
