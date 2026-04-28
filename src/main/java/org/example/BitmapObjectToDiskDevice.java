@@ -34,7 +34,7 @@ public class BitmapObjectToDiskDevice {
     }
 
     byte[] readInodeBitmapFromDisk() throws IOException {
-        long totalAddressableInodes = (BlockToBufferDevice.BLOCK_SIZE / InodeObjectToDiskDevice.INODE_SIZE) * this.diskMetadata.inodeTableRegionBlockCount;
+        long totalAddressableInodes = (BlockToBufferDevice.BLOCK_SIZE / Inode.INODE_SIZE) * this.diskMetadata.inodeTableRegionBlockCount;
 
         Bitmapper bitmapper = new Bitmapper(totalAddressableInodes);
 

@@ -61,12 +61,32 @@ public class DirectoryEntryManager {
         }
 
         // no free slot found
-        throw new IllegalStateException("directory is full");
+        throw new IllegalArgumentException("directory is full");
 
     }
 
     void removeEntry(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key cannot be null");
+        }
+
         // 1. find matching entry
-        // 2. set that array slot to null
+        int x = 0;
+
+        while (x < this.directoryEntries.length) {
+            DirectoryEntry current = this.directoryEntries[x];
+
+            // 2. set that array slot to null
+            if (current != null && key.equals(current.name)) {
+                this.directoryEntries[x] = null;
+                return; //stop after removing
+            }
+
+            x++;
+        }
+
+        // no removal slot found
+        throw new IllegalArgumentException("no matching entry");
+
     }
 }

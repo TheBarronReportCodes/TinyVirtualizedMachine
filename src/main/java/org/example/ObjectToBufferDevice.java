@@ -1,7 +1,9 @@
 package org.example;
 
-//  Buffer to Object Interface
-//  This code does not read and write an inode object to disk; It reads and writes an inode object to and from an inode-sized byte buffer.
+/**
+ * encode: write in memory object to buffer [prep for movement to disk]
+ * decode: read in memory object from buffer [prep for use in memory]
+ */
 public class ObjectToBufferDevice {
 
     static byte[] encodeDiskMetadataObjectIntoBuffer(DiskMetadata metadata) {
@@ -137,57 +139,68 @@ public class ObjectToBufferDevice {
                 .build();
     }
 
-    static byte[] encodeFileMetadataObjectIntoBuffer(FileMetadata metadata) {         // Inode -> byte[128]
+    static byte[] encodeInodeObjectIntoBuffer(Inode metadata) {         // Inode -> byte[128]
         if (metadata == null) {
             throw new IllegalArgumentException("no valid disk metadata found");
         }
 
-        byte[] ramBuffer = new byte[InodeObjectToDiskDevice.INODE_SIZE];
+        byte[] ramBuffer = new byte[Inode.INODE_SIZE];
 
-        writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_TYPE_BYTE_OFFSET, metadata.fileType);
-        writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_SIZE_BYTE_OFFSET, metadata.fileSize);
+        writeLongLE(ramBuffer, Inode.InodeSchema.FILE_TYPE_BYTE_OFFSET, metadata.fileType);
+        writeLongLE(ramBuffer, Inode.InodeSchema.FILE_SIZE_BYTE_OFFSET, metadata.fileSize);
 
         int i = 0;
         int pointersOffset = 0;
         while(i < metadata.fileDiskBlockPointers.length) {
-            writeLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET + pointersOffset, metadata.fileDiskBlockPointers[i]);
-            pointersOffset += FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTER_LEN;
+            writeLongLE(ramBuffer, Inode.InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET + pointersOffset, metadata.fileDiskBlockPointers[i]);
+            pointersOffset += Inode.InodeSchema.FILE_DISK_BLOCK_POINTER_LEN;
             i++;
         }
 
         return ramBuffer;
     }
 
-    static FileMetadata decodeBufferIntoFileMetadataObject(byte[] ramBuffer) {             // byte[128] -> Inode
+    static Inode decodeBufferIntoInodeObject(byte[] ramBuffer) {             // byte[128] -> Inode
         if(ramBuffer == null) {
             throw new IllegalArgumentException("ramBuffer cannot be null");
         }
-        if(ramBuffer.length != InodeObjectToDiskDevice.INODE_SIZE) {
+        if(ramBuffer.length != Inode.INODE_SIZE) {
             throw new IllegalArgumentException("invalid buffer size");
         }
 
-        byte fileType = ramBuffer[FileMetadata.InodeSchema.FILE_TYPE_BYTE_OFFSET];
+        byte fileType = ramBuffer[Inode.InodeSchema.FILE_TYPE_BYTE_OFFSET];
 
-        long fileSize = readLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_SIZE_BYTE_OFFSET);
+        long fileSize = readLongLE(ramBuffer, Inode.InodeSchema.FILE_SIZE_BYTE_OFFSET);
 
-        long[] diskBlockPointers = new long[FileMetadata.InodeSchema.TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS];
+        long[] diskBlockPointers = new long[Inode.InodeSchema.TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS];
 
         int i = 0;
         int pointerOffset = 0;
         while(i < diskBlockPointers.length) {
-            diskBlockPointers[i] = readLongLE(ramBuffer, FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET + pointerOffset);
+            diskBlockPointers[i] = readLongLE(ramBuffer, Inode.InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET + pointerOffset);
 
-            pointerOffset = pointerOffset + FileMetadata.InodeSchema.FILE_DISK_BLOCK_POINTER_LEN;
+            pointerOffset = pointerOffset + Inode.InodeSchema.FILE_DISK_BLOCK_POINTER_LEN;
             i++;
         }
 
-        return new FileMetadata.Builder()
+        return new Inode.Builder()
                     .setFileType(fileType)
                     .setFileSize(fileSize)
                     .setFileDiskBlockPointers(diskBlockPointers)
                     .build();
 
     }
+
+    static DirectoryEntry decodeBufferIntoDirectoryEntryObject() {
+
+        return null;
+    }
+
+    static byte[] encodeDirectoryEntryObjectIntoBuffer(DirectoryEntry directoryEntry) {
+
+        return null;
+    }
+
 
     // -------------------------
     // Little-endian primitives

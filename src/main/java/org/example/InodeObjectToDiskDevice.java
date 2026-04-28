@@ -3,7 +3,7 @@ package org.example;
 import java.io.IOException;
 
 /**
- * PURPOSE: Given an index, retrieve or persist fileMetadata to/from Disk
+ * PURPOSE: Given an index, retrieve or persist inode to/from Disk
  *
  * reads and writes an inodeBuffer to/from disk
  *
@@ -22,7 +22,6 @@ import java.io.IOException;
  * how to turn an Inode object back into bytes
  */
 public class InodeObjectToDiskDevice {
-    static int INODE_SIZE = 128;
     DiskMetadata diskMetadata;
     BlockToBufferDevice blockToBufferDevice;
     final int inodesPerBlock;
@@ -35,7 +34,7 @@ public class InodeObjectToDiskDevice {
         this.diskMetadata = diskMetadata;
         this.blockToBufferDevice = blockToBufferDevice;
 
-        this.inodesPerBlock = BlockToBufferDevice.BLOCK_SIZE / INODE_SIZE;
+        this.inodesPerBlock = BlockToBufferDevice.BLOCK_SIZE / Inode.INODE_SIZE;
     }
 
     /**
@@ -47,26 +46,26 @@ public class InodeObjectToDiskDevice {
      * modulo = where inside the group?
      *
      */
-    public FileMetadata readInodeObjectFromDisk(int inodeIndex) throws IOException {
+    public Inode readInodeObjectFromDisk(int inodeIndex) throws IOException {
 
         int blockIndex = inodeIndex / this.inodesPerBlock;
         int inodeIndexInsideBlock = inodeIndex % this.inodesPerBlock;
-        int inodeByteOffsetInsideBlock = inodeIndexInsideBlock * INODE_SIZE;
+        int inodeByteOffsetInsideBlock = inodeIndexInsideBlock * Inode.INODE_SIZE;
 
         //BLOCK TO BUFFER
         byte[] blockBuffer = this.blockToBufferDevice.readBlockIntoBuffer(this.diskMetadata.inodeTableRegionStartBlock + blockIndex);
 
         //BUFFER TO BUFFER
         int x = 0;
-        byte[] inodeBuffer = new byte[INODE_SIZE];
+        byte[] inodeBuffer = new byte[Inode.INODE_SIZE];
 
-        while(x < INODE_SIZE) {
+        while(x < Inode.INODE_SIZE) {
             inodeBuffer[x] = blockBuffer[(inodeByteOffsetInsideBlock) + x];
             x++;
         }
 
         //BUFFER TO OBJECT
-        return ObjectToBufferDevice.decodeBufferIntoFileMetadataObject(inodeBuffer);
+        return ObjectToBufferDevice.decodeBufferIntoInodeObject(inodeBuffer);
     }
 
     /**
@@ -78,20 +77,20 @@ public class InodeObjectToDiskDevice {
      * modulo = where inside the group?
      *
      */
-    public void writeInodeObjectToDisk(int inodeIndex, FileMetadata fileMetadata) throws IOException {
+    public void writeInodeObjectToDisk(int inodeIndex, Inode inode) throws IOException {
 
         int blockIndex = inodeIndex / this.inodesPerBlock;
         int inodeIndexInsideBlock = inodeIndex % this.inodesPerBlock;
-        int inodeByteOffsetInsideBlock = inodeIndexInsideBlock * INODE_SIZE;
+        int inodeByteOffsetInsideBlock = inodeIndexInsideBlock * Inode.INODE_SIZE;
 
         //OBJECT TO BUFFER
-        byte[] inodeBuffer = ObjectToBufferDevice.encodeFileMetadataObjectIntoBuffer(fileMetadata);
+        byte[] inodeBuffer = ObjectToBufferDevice.encodeInodeObjectIntoBuffer(inode);
 
         //BUFFER TO BUFFER
         byte[] blockBuffer = this.blockToBufferDevice.readBlockIntoBuffer(this.diskMetadata.inodeTableRegionStartBlock + blockIndex);
 
         int x = 0;
-        while(x < INODE_SIZE) {
+        while(x < Inode.INODE_SIZE) {
             blockBuffer[inodeByteOffsetInsideBlock + x] = inodeBuffer[x];
             x++;
         }

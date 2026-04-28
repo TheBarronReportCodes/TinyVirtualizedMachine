@@ -1,21 +1,22 @@
 package org.example;
 
 /**
- * An inode (index node) [a.k.a file metadata] is an object that stores the metadata about a file, but not
+ * An inode (index node) [a.k.a file metadata] is an object that stores the metadata about a file or directory, but not
  * its name or its actual content
  */
-public class FileMetadata {
-    byte fileType;
+public class Inode {
+    static int INODE_SIZE = 128;
+    byte fileType;  // file object or directory object [1 for file; 2 for directory]
     long fileSize;
     long[] fileDiskBlockPointers;
 
-    private FileMetadata(Builder builder) {
+    private Inode(Builder builder) {
         this.fileType = builder.fileType;
         this.fileSize = builder.fileSize;
         this.fileDiskBlockPointers = builder.fileDiskBlockPointers;
     }
 
-    //builder design pattern: Offsets creation of the FileMetadata object to another object, called the Builder; allowing fields to be validated & optionally created
+    //builder design pattern: Offsets creation of the Inode object to another object, called the Builder; allowing fields to be validated & optionally created
     public static class Builder {
         private byte fileType;
         private long fileSize;
@@ -36,22 +37,22 @@ public class FileMetadata {
             return this;
         }
 
-        public FileMetadata build() {
+        public Inode build() {
 
             validateLayoutInvariants();
-            return new FileMetadata(this);
+            return new Inode(this);
 
         }
 
         // ---- layout + consistency checks ----
         private void validateLayoutInvariants() {
             // Basic schema sanity
-            require(InodeObjectToDiskDevice.INODE_SIZE > 0, "inode size must be > 0");
+            require(INODE_SIZE > 0, "inode size must be > 0");
             require(InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET >= 0, "direct pointers offset must be >= 0");
             require(InodeSchema.FILE_DISK_BLOCK_POINTER_LEN > 0, "pointer size must be > 0");
-            require(InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET <= InodeObjectToDiskDevice.INODE_SIZE,
+            require(InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET <= INODE_SIZE,
                     "direct pointers offset must be <= inode size");
-            require((InodeObjectToDiskDevice.INODE_SIZE - InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) % InodeSchema.FILE_DISK_BLOCK_POINTER_LEN == 0,
+            require((INODE_SIZE - InodeSchema.FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) % InodeSchema.FILE_DISK_BLOCK_POINTER_LEN == 0,
                     "direct pointer region must be an integer number of pointers");
 
 
@@ -101,7 +102,14 @@ public class FileMetadata {
         }
     }
 
-    // inode schema; used to interpret the inode on disk
+    /**
+     * PURPOSE: tells how to interpret the inode's data blocks [on disk]
+     *
+     * [ fileType   (1 byte)    ]
+     * [ fileSize   (8 bytes)   ]
+     * [ fileDiskBlockPointer   (8 bytes)   ]
+     *
+     */
     public static class InodeSchema {
         static final int FILE_TYPE_BYTE_OFFSET = 0;
         static final int FILE_TYPE_LEN = 1;
@@ -111,7 +119,7 @@ public class FileMetadata {
 
         static final int FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET = 16;
         static final int FILE_DISK_BLOCK_POINTER_LEN = 8;
-        static final int TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS = (InodeObjectToDiskDevice.INODE_SIZE - FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) / FILE_DISK_BLOCK_POINTER_LEN;
+        static final int TOTAL_NUMBER_OF_ADDRESSABLE_DISK_BLOCK_POINTERS = (INODE_SIZE - FILE_DISK_BLOCK_POINTERS_BYTE_OFFSET) / FILE_DISK_BLOCK_POINTER_LEN;
 
     }
 
